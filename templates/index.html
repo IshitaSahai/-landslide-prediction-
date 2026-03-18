@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraGuard | Landslide Risk Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body class="dark-theme">
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🌋</span>
+                <span class="logo-text">TerraGuard</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#prediction" class="cta-btn">Predict Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="animate-up">Predicting the Unpredictable</h1>
+            <p class="animate-up delay-1">Advanced Machine Learning for Real-time Landslide Risk Assessment and Disaster Prevention.</p>
+            <div class="hero-btns animate-up delay-2">
+                <a href="#prediction" class="primary-btn">Start Analysis</a>
+                <a href="#about" class="secondary-btn">Learn More</a>
+            </div>
+        </div>
+        <div class="hero-overlay"></div>
+    </header>
+
+    <section id="how-it-works" class="section">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-icon">📊</div>
+                    <h3>Data Input</h3>
+                    <p>Enter geological and environmental factors like rainfall, slope, and soil condition.</p>
+                </div>
+                <div class="flow-arrow">➜</div>
+                <div class="flow-step">
+                    <div class="step-icon">🧠</div>
+                    <h3>ML Analysis</h3>
+                    <p>Ensemble models (XGBoost, LightGBM, SVM) process data with feature engineering.</p>
+                </div>
+                <div class="flow-arrow">➜</div>
+                <div class="flow-step">
+                    <div class="step-icon">⚠️</div>
+                    <h3>Risk Assessment</h3>
+                    <p>Instant risk classification with detailed probability metrics and safety levels.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="prediction" class="section prediction-section">
+        <div class="container">
+            <h2 class="section-title">Risk Assessment Tool</h2>
+            <div class="prediction-card glass">
+                <form id="prediction-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Rainfall_mm">Annual Rainfall (mm)</label>
+                            <input type="number" id="Rainfall_mm" name="Rainfall_mm" placeholder="e.g., 2500" required step="any" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="Slope_Angle">Slope Angle (°)</label>
+                            <input type="number" id="Slope_Angle" name="Slope_Angle" placeholder="0 - 90" required step="any" min="0" max="90">
+                        </div>
+                        <div class="form-group">
+                            <label for="Soil_Saturation">Soil Saturation (0-1)</label>
+                            <input type="number" id="Soil_Saturation" name="Soil_Saturation" placeholder="e.g., 0.75" required step="any" min="0" max="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="Vegetation_Cover">Vegetation Cover (0-1)</label>
+                            <input type="number" id="Vegetation_Cover" name="Vegetation_Cover" placeholder="e.g., 0.4" required step="any" min="0" max="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="Earthquake_Activity">Earthquake Activity (Magnitude)</label>
+                            <input type="number" id="Earthquake_Activity" name="Earthquake_Activity" placeholder="e.g., 4.5" required step="any" min="0" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="Proximity_to_Water">Proximity to Water (0-1)</label>
+                            <input type="number" id="Proximity_to_Water" name="Proximity_to_Water" placeholder="e.g., 0.2" required step="any" min="0" max="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="LULC">Land Use Type</label>
+                            <select id="LULC" name="LULC">
+                                <option value="Forest">Forest</option>
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Barren">Barren</option>
+                                <option value="Urban">Urban</option>
+                                <option value="Grassland">Grassland</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="Elevation">Elevation (m)</label>
+                            <input type="number" id="Elevation" name="Elevation" placeholder="e.g., 1200" step="any">
+                        </div>
+                    </div>
+                    <button type="submit" class="predict-btn">Analyze Risk Profile</button>
+                </form>
+
+                <div id="result" class="result-container hidden">
+                    <div class="result-header">
+                        <h3>Assessment Result</h3>
+                        <div id="risk-badge" class="badge">Low</div>
+                    </div>
+                    <div class="result-content">
+                        <div class="metric">
+                            <span>Landslide Probability</span>
+                            <div class="progress-bar">
+                                <div id="prob-fill" class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <span id="prob-text">0%</span>
+                        </div>
+                        <p id="risk-msg"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section alt-bg">
+        <div class="container about-grid">
+            <div class="about-text">
+                <h2 class="section-title left">About the Project</h2>
+                <p>TerraGuard is a state-of-the-art landslide prediction system designed to mitigate natural disasters through data science. By leveraging historical geological records and real-time environmental data, our model identifies high-risk zones with high precision.</p>
+                <p>Our ensemble learning approach combines the strengths of various algorithms, ensuring robust predictions even in diverse terrain conditions.</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-num">94%</span>
+                        <span class="stat-label">Model Accuracy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num">15+</span>
+                        <span class="stat-label">Risk Factors</span>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1541844053589-c4669f3b9470?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Landslide Mitigation">
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 TerraGuard Landslide Prediction Project. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
