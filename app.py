@@ -43,44 +43,52 @@ def predict():
         # Map input to feature names
         input_data = {}
         
-        # Base features
-        input_data['Rainfall_mm'] = float(data.get('Rainfall_mm', 0))
-        input_data['Slope_Angle'] = float(data.get('Slope_Angle', 0))
-        input_data['Soil_Saturation'] = float(data.get('Soil_Saturation', 0))
-        input_data['Vegetation_Cover'] = float(data.get('Vegetation_Cover', 0))
-        input_data['Earthquake_Activity'] = float(data.get('Earthquake_Activity', 0))
-        input_data['Proximity_to_Water'] = float(data.get('Proximity_to_Water', 0))
+        # Base features from user input
+        rainfall = float(data.get('Rainfall_mm', 1000))
+        slope = float(data.get('Slope_Angle', 30))
+        elevation = float(data.get('Elevation', 1500))
+        veg_cover = float(data.get('Vegetation_Cover', 0.5))
+        soil_sat = float(data.get('Soil_Saturation', 0.5))
+        curvature = float(data.get('Curvature', 0.0))
+        earthquake = float(data.get('Earthquake_Activity', 1.0))
+        prox_water = float(data.get('Proximity_to_Water', 0.5))
         
-        # Enhanced features (calculated in the backend as per train_model.py)
-        elevation = float(data.get('Elevation', (input_data['Slope_Angle'] * 25 + 500)))
+        input_data['Rainfall_mm'] = rainfall
+        input_data['Slope_Angle'] = slope
         input_data['Elevation'] = elevation
-        input_data['Curvature'] = float(data.get('Curvature', input_data['Slope_Angle'] * 0.01))
-        input_data['Drainage_Density'] = float(data.get('Drainage_Density', 4.0))
-        input_data['Distance_to_River'] = float(data.get('Distance_to_River', (1 - input_data['Proximity_to_Water']) * 5))
-        input_data['Rainfall_24h'] = input_data['Rainfall_mm'] * 0.4
-        input_data['Rainfall_48h'] = input_data['Rainfall_mm'] * 0.7
-        input_data['Rainfall_72h'] = input_data['Rainfall_mm'] * 0.9
+        input_data['Vegetation_Cover'] = veg_cover
+        input_data['Soil_Saturation'] = soil_sat
+        input_data['Curvature'] = curvature
+        input_data['Earthquake_Activity'] = earthquake
+        input_data['Proximity_to_Water'] = prox_water
+        
+        # New features from GEE dataset (defaults if not in JSON)
+        input_data['TRI'] = float(data.get('TRI', 25.0))
+        input_data['TWI'] = float(data.get('TWI', 10.0))
+        input_data['Aspect'] = float(data.get('Aspect', 180.0))
+        
+        # Engineered features (must match train_model.py)
+        input_data['Slope_Elevation_Interaction'] = slope * elevation / 1000
+        input_data['Slope_Curvature_Interaction'] = slope * curvature
+        input_data['Rainfall_Saturation'] = rainfall * soil_sat
+        input_data['Rainfall_24h'] = rainfall * 0.4
+        input_data['Rainfall_72h'] = rainfall * 0.9
+        input_data['Rainfall_Intensity_Change'] = (input_data['Rainfall_72h'] - input_data['Rainfall_24h']) / 48
         
         # Handle LULC
         lulc = data.get('LULC', 'Forest')
-        for cat in ['Forest', 'Agriculture', 'Barren', 'Urban', 'Grassland']:
+        for cat in ['Agriculture', 'Barren', 'Forest', 'Grassland', 'Urban']:
             input_data[f'LULC_{cat}'] = 1.0 if lulc == cat else 0.0
             
-        # Engineered features
-        input_data['Slope_Elevation_Interaction'] = input_data['Slope_Angle'] * input_data['Elevation'] / 1000
-        input_data['Slope_Curvature_Interaction'] = input_data['Slope_Angle'] * input_data['Curvature']
-        input_data['Rainfall_Saturation'] = input_data['Rainfall_mm'] * input_data['Soil_Saturation']
-        input_data['Water_Proximity_Drainage'] = input_data['Proximity_to_Water'] * input_data['Drainage_Density']
-        input_data['Rainfall_Intensity_24h'] = input_data['Rainfall_24h'] / 24
-        input_data['Rainfall_Intensity_Change'] = (input_data['Rainfall_72h'] - input_data['Rainfall_24h']) / 48
-        input_data['Veg_Slope_Risk'] = (1 - input_data['Vegetation_Cover']) * input_data['Slope_Angle']
-        input_data['Risk_Composite'] = (
-            input_data['Rainfall_mm'] / 300 * 0.3 +
-            input_data['Slope_Angle'] / 60 * 0.25 +
-            input_data['Soil_Saturation'] * 0.2 +
-            (1 - input_data['Vegetation_Cover']) * 0.15 +
-            input_data['Earthquake_Activity'] / 7 * 0.1
+        # Composite risk indicator (approximation of the logic in train_model.py)
+        risk_score = (
+            (slope / 70 * 0.35) + 
+            (rainfall / 2000 * 0.25) + 
+            ((1 - veg_cover) * 0.15) + 
+            (soil_sat * 0.15) + 
+            (abs(curvature) * 0.1)
         )
+        input_data['Risk_Composite'] = risk_score
 
         # Create feature vector in correct order
         features = []
@@ -91,7 +99,7 @@ def predict():
         features_scaled = scaler.transform([features])
         proba = model.predict_proba(features_scaled)[0][1]
         
-        # Categorize risk
+        # Categorize risk (consistent with training logic)
         if proba < 0.2:
             risk = "Very Low"
         elif proba < 0.4:

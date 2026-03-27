@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+bin/
+lib/
+include/
+
+# Data & Models
+# landslide_dataset.csv
+# landslide_enhanced.csv
+# final_dataset_safe.csv
+# models/
+# (Optional: Uncomment above if you want to keep data/models out of Git)
+
+# Environment
+.env
+.DS_Store
+Thumbs.db
+
+# Flask
+instance/
+.webassets-cache

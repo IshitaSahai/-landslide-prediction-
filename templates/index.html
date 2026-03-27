@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body class="dark-theme">
+<body class="light-theme">
     <nav id="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -137,17 +137,17 @@
                 <p>Our ensemble learning approach combines the strengths of various algorithms, ensuring robust predictions even in diverse terrain conditions.</p>
                 <div class="stats">
                     <div class="stat-item">
-                        <span class="stat-num">94%</span>
+                        <span class="stat-num">99%</span>
                         <span class="stat-label">Model Accuracy</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-num">15+</span>
+                        <span class="stat-num">12+</span>
                         <span class="stat-label">Risk Factors</span>
                     </div>
                 </div>
             </div>
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1541844053589-c4669f3b9470?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Landslide Mitigation">
+                <img src="{{ url_for('static', filename='mitigation.png') }}" alt="Landslide Mitigation">
             </div>
         </div>
     </section>
