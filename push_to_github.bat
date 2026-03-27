@@ -1,6 +1,6 @@
 @echo off
 echo ====================================================
-echo   TerraGuard Landslide Prediction - GitHub Sync
+echo   TerraGuard Landslide Prediction - GitHub Sync (V2)
 echo ====================================================
 
 REM Initialize Git if not already
@@ -17,7 +17,7 @@ git add .
 
 REM Commit changes
 echo [3/5] Committing project...
-git commit -m "Complete Landslide Prediction Project: Retrained with new dataset and Light Mode UI"
+git commit -m "Complete Project with ML models and Light Mode UI" 2>nul
 
 REM Set remote origin
 echo [4/5] Setting remote origin...
@@ -27,10 +27,10 @@ if %errorlevel% neq 0 (
 )
 git branch -M main
 
-REM Push to GitHub
-echo [5/5] Pushing to GitHub (main)...
-echo IMPORTANT: A login window may appear. Please follow GitHub's instructions.
-git push -u origin main
+REM Push to GitHub (Force)
+echo [5/5] Pushing to GitHub (Enforcing project files)...
+echo This will override any existing files on GitHub with your local project.
+git push -u origin main -f
 
 echo.
 echo ====================================================
